@@ -15,6 +15,8 @@ import * as controller from "./controller.js";
 
 router.route("/").get(controller.getAll).post(controller.create);
 
+router.param("id", controller.id);
+
 router
   .route("/:id")
   .get(controller.read)

@@ -1,4 +1,6 @@
 import { prisma } from "../../../database.js";
+import { parsePagination, parseOrder } from "../../../uutils.js";
+import { fields } from "./model.js";
 
 export const create = async (req, res, next) => {
   const { body = {} } = req;
@@ -18,15 +20,38 @@ export const create = async (req, res, next) => {
 };
 
 export const getAll = async (req, res, next) => {
+  const { query = {} } = req;
+  const { offset, limit } = parsePagination(query);
+  const { orderBy, direction } = parseOrder({ fields, ...query });
   try {
-    const result = await prisma.blog.findMany();
-    res.json({ data: result });
+    const [result, total] = await Promise.all([
+      prisma.blog.findMany({
+        skip: offset,
+        take: limit,
+        orderBy: {
+          [orderBy]: direction,
+        },
+      }),
+      prisma.blog.count(),
+    ]);
+
+    res.json({
+      data: result,
+
+      meta: {
+        offset,
+        limit,
+        total,
+        orderBy,
+        direction,
+      },
+    });
   } catch (error) {
     next(error);
   }
 };
 
-export const read = async (req, res, next) => {
+export const id = async (req, res, next) => {
   const { params = {} } = req;
 
   try {
@@ -35,10 +60,29 @@ export const read = async (req, res, next) => {
         id: params.id,
       },
     });
+    req.result = result;
 
-    if (!result) {
-      return next({ message: "Blog not found", status: 404 });
-    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const read = async (req, res, next) => {
+  res.json({ data: req.result });
+};
+
+export const update = async (req, res, next) => {
+  const { params = {}, body = {} } = req;
+  const { id } = params;
+
+  try {
+    const result = await prisma.blog.update({
+      where: {
+        id,
+      },
+      data: { ...body, updatedAt: new Date().toISOString() },
+    });
 
     res.json({ data: result });
   } catch (error) {
@@ -46,11 +90,19 @@ export const read = async (req, res, next) => {
   }
 };
 
-export const update = async (req, res) => {
-  res.json({ data: {} });
-};
+export const remove = async (req, res, error) => {
+  const { params = {} } = req;
+  const { id } = params;
 
-export const remove = async (req, res) => {
-  res.status(204);
-  res.end();
+  try {
+    await prisma.blog.delete({
+      where: {
+        id,
+      },
+    });
+    res.status(204);
+    res.end();
+  } catch (error) {
+    next(error);
+  }
 };
