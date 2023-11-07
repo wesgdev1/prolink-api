@@ -11,16 +11,18 @@ datasource db {
 }
 
 model Usuario {
-  id          String       @id @default(uuid()) @db.Uuid
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime?    @updatedAt
-  email       String       @unique
-  tipoUsuario String
-  password    String
-  urlFoto     String?
-  cliente     Cliente?
-  tecnico     Tecnico?
-  comentarios Comentario[]
+  id              String       @id @default(uuid()) @db.Uuid
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime?    @updatedAt
+  email           String       @unique
+  tipoUsuario     String
+  password        String
+  urlFoto         String?
+  cliente         Cliente?
+  tecnico         Tecnico?
+  comentarios     Comentario[]
+  tipoDocumento   String?
+  numeroDocumento String?      @unique
 }
 
 model Tecnico {
@@ -29,11 +31,11 @@ model Tecnico {
   updatedAt        DateTime?        @updatedAt
   email            String           @unique
   tipoDocumento    String
-  numeroDocumento  String
+  numeroDocumento  String           @unique
   telefono         String
   direccion        String
-  usuario          Usuario          @relation(fields: [usuarioId], references: [id])
-  usuarioId        String           @unique @db.Uuid
+  usuario          Usuario?         @relation(fields: [usuarioId], references: [id])
+  usuarioId        String?          @unique @db.Uuid
   blogs            Blog[]
   soportesTecnicos SoporteTecnico[]
 }
@@ -47,7 +49,7 @@ model Cliente {
   numeroDocumento  String
   telefono         String
   direccion        String
-  usuario          Usuario          @relation(fields: [usuarioId], references: [id])
+  usuario          Usuario?         @relation(fields: [usuarioId], references: [id])
   usuarioId        String           @unique @db.Uuid
   facturas         Factura[]
   pagos            Pago[]
@@ -96,7 +98,7 @@ model SoporteTecnico {
   descripcion String
   estado      Boolean   @default(false)
   solucion    String?
-  tecnico     Tecnico   @relation(fields: [tecnicoId], references: [id])
+  tecnico     Tecnico?  @relation(fields: [tecnicoId], references: [id])
   tecnicoId   String    @db.Uuid
   cliente     Cliente   @relation(fields: [clienteId], references: [id])
   clienteId   String    @db.Uuid

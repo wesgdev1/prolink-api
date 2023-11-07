@@ -2,11 +2,57 @@ import { prisma } from "../../../database.js";
 import { parsePagination, parseOrder } from "../../../uutils.js";
 import { fields } from "./model.js";
 
-export const create = async (req, res, next) => {
+export const signup = async (req, res, next) => {
   const { body = {} } = req;
 
   try {
-    const result = await prisma.blog.create({
+    // Hare una consulta para ver si el numero de documento existe en la tabla tecnico
+    const result = await prisma.tecnico.findUnique({
+      where: {
+        numeroDocumento: body.numeroDocumento,
+      },
+    });
+
+    // Si el resultado es null, quiere decir que no existe el numero de documento en la tabla tecnico
+    if (result === null) {
+      next({
+        message:
+          "No estas registrado como tecnico en el sistema, contacta al Administrador",
+        status: 404,
+      });
+    } else {
+      // creame el usuario
+      const result = await prisma.usuario.create({
+        data: body,
+      });
+      // y relaciono el usuario con el tecnico
+      await prisma.tecnico.update({
+        where: {
+          numeroDocumento: body.numeroDocumento,
+        },
+        data: {
+          usuario: {
+            connect: {
+              id: result.id,
+            },
+          },
+        },
+      });
+      res.status(201);
+      res.json({
+        data: result,
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const signin = async (req, res, next) => {
+  const { body = {} } = req;
+
+  try {
+    const result = await prisma.usuario.create({
       data: body,
     });
 
@@ -25,21 +71,14 @@ export const getAll = async (req, res, next) => {
   const { orderBy, direction } = parseOrder({ fields, ...query });
   try {
     const [result, total] = await Promise.all([
-      prisma.blog.findMany({
+      prisma.usuario.findMany({
         skip: offset,
         take: limit,
         orderBy: {
           [orderBy]: direction,
         },
-        include: {
-          tecnico: {
-            select: {
-              email: true,
-            },
-          },
-        },
       }),
-      prisma.blog.count(),
+      prisma.usuario.count(),
     ]);
 
     res.json({
@@ -62,7 +101,7 @@ export const id = async (req, res, next) => {
   const { params = {} } = req;
 
   try {
-    const result = await prisma.blog.findUnique({
+    const result = await prisma.usuario.findUnique({
       where: {
         id: params.id,
       },
@@ -89,7 +128,7 @@ export const update = async (req, res, next) => {
   const { id } = params;
 
   try {
-    const result = await prisma.blog.update({
+    const result = await prisma.usuario.update({
       where: {
         id,
       },
@@ -107,7 +146,7 @@ export const remove = async (req, res, error) => {
   const { id } = params;
 
   try {
-    await prisma.blog.delete({
+    await prisma.usuario.delete({
       where: {
         id,
       },
