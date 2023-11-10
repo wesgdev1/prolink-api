@@ -16,4 +16,9 @@ export const configuration = {
     direction: "desc",
     orderBy: "createdAt",
   },
+
+  token: {
+    secret: process.env.TOKEN_SECRET,
+    expires: process.env.TOKEN_EXPIRES,
+  },
 };

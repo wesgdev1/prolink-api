@@ -4,6 +4,7 @@ import { Router } from "express";
 export const router = Router();
 
 import * as controller from "./controller.js";
+import { auth, owner } from "../auth.js";
 
 /**
  * /api/v1/blogs POST - Create a new blog
@@ -13,13 +14,13 @@ import * as controller from "./controller.js";
  * /api/v1/blogs/:id DELETE - Delete a blog
  */
 
-router.route("/").get(controller.getAll).post(controller.create);
+router.route("/").get(controller.getAll).post(auth, controller.create);
 
 router.param("id", controller.id);
 
 router
   .route("/:id")
-  .get(controller.read)
-  .put(controller.update)
-  .patch(controller.update)
-  .delete(controller.remove);
+  .get(auth, controller.read)
+  .put(auth, owner, controller.update)
+  .patch(auth, owner, controller.update)
+  .delete(auth, owner, controller.remove);

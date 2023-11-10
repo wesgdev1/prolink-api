@@ -29,6 +29,7 @@ model Tecnico {
   id               String           @id @default(uuid()) @db.Uuid
   createdAt        DateTime         @default(now())
   updatedAt        DateTime?        @updatedAt
+  nombreCompleto   String?
   email            String           @unique
   tipoDocumento    String
   numeroDocumento  String           @unique
@@ -45,12 +46,13 @@ model Cliente {
   createdAt        DateTime         @default(now())
   updatedAt        DateTime?        @updatedAt
   nombreCompleto   String
+  numeroContrato   Int?
   tipoDocumento    String
   numeroDocumento  String
   telefono         String
   direccion        String
   usuario          Usuario?         @relation(fields: [usuarioId], references: [id])
-  usuarioId        String           @unique @db.Uuid
+  usuarioId        String?          @unique @db.Uuid
   facturas         Factura[]
   pagos            Pago[]
   soportesTecnicos SoporteTecnico[]
@@ -105,15 +107,17 @@ model SoporteTecnico {
 }
 
 model Factura {
-  id          String    @id @default(uuid()) @db.Uuid
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime? @updatedAt
-  fechaLimite DateTime
-  total       Float
-  estado      Boolean   @default(false)
-  cliente     Cliente   @relation(fields: [clienteId], references: [id])
-  clienteId   String    @db.Uuid
-  pagos       Pago[]
+  id                  String    @id @default(uuid()) @db.Uuid
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime? @updatedAt
+  fechaLimite         DateTime
+  total               Int
+  estado              Boolean   @default(false)
+  cliente             Cliente?  @relation(fields: [clienteId], references: [id])
+  clienteId           String?   @db.Uuid
+  descripcionServicio String?
+  referencia          String?
+  pagos               Pago[]
 }
 
 model Pago {
@@ -124,6 +128,6 @@ model Pago {
   valor     Float
   factura   Factura   @relation(fields: [facturaId], references: [id])
   facturaId String    @db.Uuid
-  cliente   Cliente   @relation(fields: [clienteId], references: [id])
-  clienteId String    @db.Uuid
+  cliente   Cliente?  @relation(fields: [clienteId], references: [id])
+  clienteId String?   @db.Uuid
 }
