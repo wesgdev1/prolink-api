@@ -13,7 +13,7 @@ import * as controller from "./controller.js";
  * /api/v1/blogs/:id DELETE - Delete a blog
  */
 
-router.route("/sigup").post(controller.signup);
+router.route("/signup").post(controller.signup);
 router.route("/signin").post(controller.signin);
 
 router.param("id", controller.id);
