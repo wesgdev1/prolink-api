@@ -158,13 +158,13 @@ export const signin = async (req, res, next) => {
     console.log(user);
 
     if (user === null) {
-      return next({ message: "Correo o contraseña incorrecto", status: 401 });
+      return next({ message: "Correo o contraseña incorrecto", status: 403 });
     }
 
     const passwordMatch = await verifyPassword(password, user.password);
 
     if (!passwordMatch) {
-      return next({ message: "Correo o contraseña incorrecto", status: 401 });
+      return next({ message: "Correo o contraseña incorrecto", status: 403 });
     }
 
     const token = signToken({
