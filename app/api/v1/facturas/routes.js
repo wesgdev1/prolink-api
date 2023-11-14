@@ -14,7 +14,7 @@ import { auth, owner } from "../auth.js";
  * /api/v1/blogs/:id DELETE - Delete a blog
  */
 
-router.route("/").get(controller.getAll).post(controller.create);
+router.route("/").get(controller.getAll).post(auth, controller.create);
 router.route("/search/:ccClient").get(controller.search);
 
 router.param("id", controller.id);

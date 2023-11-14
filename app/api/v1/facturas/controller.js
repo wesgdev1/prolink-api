@@ -7,12 +7,19 @@ export const create = async (req, res, next) => {
 
   const { body = {} } = req;
   const { facturas } = body;
-  console.log(facturas);
+  const arregloDeFacturas = Object.values(facturas);
+
+  arregloDeFacturas.forEach((objeto) => {
+    objeto.total = parseInt(objeto.total, 10);
+  });
+  console.log(arregloDeFacturas);
 
   try {
     const result = await prisma.factura.createMany({
-      data: facturas,
+      data: arregloDeFacturas,
     });
+
+    console.log(result);
 
     res.status(201);
     res.json({
@@ -34,6 +41,14 @@ export const getAll = async (req, res, next) => {
         take: limit,
         orderBy: {
           [orderBy]: direction,
+        },
+        include: {
+          cliente: {
+            select: {
+              nombreCompleto: true,
+              numeroDocumento: true,
+            },
+          },
         },
       }),
       prisma.factura.count(),
