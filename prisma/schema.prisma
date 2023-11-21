@@ -62,7 +62,6 @@ model Blog {
   id          String       @id @default(uuid()) @db.Uuid
   createdAt   DateTime     @default(now())
   updatedAt   DateTime?    @updatedAt
-  urlFoto     String?
   title       String
   content     String
   published   Boolean      @default(false)
@@ -71,6 +70,7 @@ model Blog {
   categoria   Categoria?   @relation(fields: [categoriaId], references: [id])
   categoriaId String?      @db.Uuid
   comentarios Comentario[]
+  fotos       Foto[]
 }
 
 model Categoria {
@@ -130,4 +130,12 @@ model Pago {
   facturaId String    @db.Uuid
   cliente   Cliente?  @relation(fields: [clienteId], references: [id])
   clienteId String?   @db.Uuid
+}
+
+model Foto {
+  id        String   @id @default(uuid()) @db.Uuid
+  url_foto  String?  @db.Text
+  createdAt DateTime @default(now())
+  Blog      Blog?    @relation(fields: [blogId], references: [id])
+  blogId    String?  @db.Uuid
 }

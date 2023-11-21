@@ -1,19 +1,88 @@
 import { prisma } from "../../../database.js";
 import { parsePagination, parseOrder } from "../../../uutils.js";
+import { uploadFiles } from "../../uploadsFile/uploads.js";
 import { fields } from "./model.js";
+import fs from "fs";
 
 export const create = async (req, res, next) => {
   const { body = {}, decoded = {} } = req;
   const { idTipoUsuario: tecnicoId } = decoded;
+  const files = req.files;
+
+  // me falta colocar si no es tecnico no esta autorizado para crear blogs
 
   try {
+    const promises = files.map((file) => {
+      return uploadFiles(file.path);
+    });
+    const urlImages = await Promise.all(promises);
+    console.log("urlImages", urlImages);
+
+    const fotosCloudinary = [];
+    for (let i = 0; i < files.length; i++) {
+      fotosCloudinary.push({ url_foto: urlImages[i].url });
+    }
+
+    files.forEach((file) => fs.unlinkSync(file.path));
+
     const result = await prisma.blog.create({
-      data: { ...body, tecnicoId },
+      data: { ...body, tecnicoId, fotos: { create: fotosCloudinary } },
     });
 
     res.status(201);
     res.json({
       data: result,
+    });
+  } catch (error) {
+    files.forEach((file) => fs.unlinkSync(file.path));
+    next(error);
+  }
+};
+
+export const myBlogs = async (req, res, next) => {
+  const { query = {} } = req;
+  const { offset, limit } = parsePagination(query);
+  const { orderBy, direction } = parseOrder({ fields, ...query });
+  const { decoded = {} } = req;
+  const { idTipoUsuario: tecnicoId } = decoded;
+  try {
+    const [result, total] = await Promise.all([
+      prisma.blog.findMany({
+        skip: offset,
+        take: limit,
+        orderBy: {
+          [orderBy]: direction,
+        },
+        where: {
+          tecnicoId,
+        },
+        include: {
+          tecnico: {
+            select: {
+              email: true,
+              nombreCompleto: true,
+            },
+          },
+          fotos: {
+            select: {
+              url_foto: true,
+            },
+          },
+        },
+      }),
+      prisma.blog.count(),
+    ]);
+
+    res.json({
+      data: result,
+
+      meta: {
+        offset,
+        limit,
+        total,
+        orderBy,
+        direction,
+      },
     });
   } catch (error) {
     next(error);
@@ -36,6 +105,11 @@ export const getAll = async (req, res, next) => {
           tecnico: {
             select: {
               email: true,
+            },
+          },
+          fotos: {
+            select: {
+              url_foto: true,
             },
           },
         },
@@ -67,6 +141,13 @@ export const id = async (req, res, next) => {
       where: {
         id: params.id,
       },
+      include: {
+        fotos: {
+          select: {
+            url_foto: true,
+          },
+        },
+      },
     });
 
     if (result === null) {
@@ -88,13 +169,33 @@ export const read = async (req, res, next) => {
 export const update = async (req, res, next) => {
   const { params = {}, body = {} } = req;
   const { id } = params;
+  const files = req.files;
 
   try {
+    let newData = { ...body };
+    if (files?.length > 0) {
+      const promises = files.map((file) => {
+        return uploadFiles(file.path);
+      });
+      const urlImages = await Promise.all(promises);
+
+      const fotosCloudinary = [];
+      for (let i = 0; i < files.length; i++) {
+        fotosCloudinary.push({ url_foto: urlImages[i].url });
+      }
+
+      files.forEach((file) => fs.unlinkSync(file.path));
+
+      newData = {
+        ...newData,
+        fotos: { deleteMany: {}, create: fotosCloudinary },
+      };
+    }
     const result = await prisma.blog.update({
       where: {
         id,
       },
-      data: { ...body, updatedAt: new Date().toISOString() },
+      data: { ...newData, updatedAt: new Date().toISOString() },
     });
 
     res.json({ data: result });
