@@ -1,11 +1,14 @@
 import { prisma } from "../../../database.js";
 import { parsePagination, parseOrder } from "../../../uutils.js";
+import { uploadFiles } from "../../uploadsFile/uploads.js";
 import { signToken } from "../auth.js";
 import { encryptPassword, verifyPassword } from "../blogs/model.js";
 import { fields } from "./model.js";
+import fs from "fs";
 
 export const signup = async (req, res, next) => {
   const { body = {} } = req;
+  const files = req.files;
 
   try {
     if (body.tipoUsuario === "Tecnico") {
@@ -25,12 +28,24 @@ export const signup = async (req, res, next) => {
         });
       } else {
         // creame el usuario y creo la relacion con el tecnico
+        const promises = files.map((file) => {
+          return uploadFiles(file.path);
+        });
+        const urlImages = await Promise.all(promises);
+
+        const fotosCloudinary = [];
+        for (let i = 0; i < files.length; i++) {
+          fotosCloudinary.push({ url_foto: urlImages[i].url });
+        }
+
+        files.forEach((file) => fs.unlinkSync(file.path));
         const password = await encryptPassword(body.password);
 
         const result = await prisma.usuario.create({
           data: {
             ...body,
             password,
+            urlFoto: urlImages[0].url,
 
             tecnico: {
               connect: {
@@ -72,15 +87,28 @@ export const signup = async (req, res, next) => {
         });
       } else {
         // creame el usuario y creo la relacion con el tecnico
+        const promises = files.map((file) => {
+          return uploadFiles(file.path);
+        });
+        const urlImages = await Promise.all(promises);
+
+        const fotosCloudinary = [];
+        for (let i = 0; i < files.length; i++) {
+          fotosCloudinary.push({ url_foto: urlImages[i].url });
+        }
+
+        files.forEach((file) => fs.unlinkSync(file.path));
+
         const password = await encryptPassword(body.password);
 
         const result = await prisma.usuario.create({
           data: {
             ...body,
             password,
+            urlFoto: urlImages[0].url,
 
-            tecnico: {
-              cliente: {
+            cliente: {
+              connect: {
                 numeroDocumento: body.numeroDocumento,
               },
             },
@@ -141,6 +169,7 @@ export const signin = async (req, res, next) => {
         email: true,
         password: true,
         tipoUsuario: true,
+        urlFoto: true,
         tecnico: {
           select: {
             id: true,
