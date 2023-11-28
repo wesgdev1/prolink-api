@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { upload } from "../../uploadsFile/uploads.js";
 
 // eslint-disable-next-line new-cap
 export const router = Router();
@@ -13,7 +14,7 @@ import * as controller from "./controller.js";
  * /api/v1/blogs/:id DELETE - Delete a blog
  */
 
-router.route("/signup").post(controller.signup);
+router.route("/signup").post(upload.array("images"), controller.signup);
 router.route("/signin").post(controller.signin);
 
 router.param("id", controller.id);

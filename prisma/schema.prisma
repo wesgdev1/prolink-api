@@ -46,11 +46,15 @@ model Cliente {
   createdAt        DateTime         @default(now())
   updatedAt        DateTime?        @updatedAt
   nombreCompleto   String
-  numeroContrato   Int?
+  email            String?          @unique
+  numeroContrato   String?
+  contratoActivo   Boolean          @default(true)
   tipoDocumento    String
-  numeroDocumento  String
+  numeroDocumento  String           @unique
   telefono         String
   direccion        String
+  servicio         String?
+  ipNavegacion     String?
   usuario          Usuario?         @relation(fields: [usuarioId], references: [id])
   usuarioId        String?          @unique @db.Uuid
   facturas         Factura[]
@@ -93,17 +97,20 @@ model Comentario {
 }
 
 model SoporteTecnico {
-  id          String    @id @default(uuid()) @db.Uuid
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime? @updatedAt
-  titulo      String
-  descripcion String
-  estado      Boolean   @default(false)
-  solucion    String?
-  tecnico     Tecnico?  @relation(fields: [tecnicoId], references: [id])
-  tecnicoId   String    @db.Uuid
-  cliente     Cliente   @relation(fields: [clienteId], references: [id])
-  clienteId   String    @db.Uuid
+  id              String    @id @default(uuid()) @db.Uuid
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime? @updatedAt
+  numeroSoporte   Int?      @unique @default(autoincrement())
+  fechaGeneracion String?
+  horaGeneracion  String?
+  titulo          String
+  descripcion     String
+  estado          Boolean   @default(false)
+  solucion        String?
+  tecnico         Tecnico?  @relation(fields: [tecnicoId], references: [id])
+  tecnicoId       String    @db.Uuid
+  cliente         Cliente   @relation(fields: [clienteId], references: [id])
+  clienteId       String    @db.Uuid
 }
 
 model Factura {
