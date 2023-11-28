@@ -24,7 +24,7 @@ export const getSoportesoftheDay = async (req, res, next) => {
   try {
     const result = await prisma.soporteTecnico.findMany({
       where: {
-        fecha: new Date().toISOString().split("T")[0],
+        fechaGeneracion: new Date().toISOString().split("T")[0],
       },
     });
 

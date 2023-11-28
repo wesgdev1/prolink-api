@@ -8,6 +8,7 @@ import { auth } from "../auth.js";
 
 router.route("/").get(controller.getAll).post(auth, controller.create);
 router.route("/mySoportes").get(auth, controller.getMySoportes);
+router.route("/soportesDia").get(auth, controller.getSoportesoftheDay);
 
 router.param("id", controller.id);
 
