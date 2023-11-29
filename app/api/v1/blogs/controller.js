@@ -103,8 +103,12 @@ export const getAll = async (req, res, next) => {
         },
         include: {
           tecnico: {
-            select: {
-              email: true,
+            include: {
+              usuario: {
+                select: {
+                  urlFoto: true,
+                },
+              },
             },
           },
           fotos: {
@@ -145,6 +149,15 @@ export const id = async (req, res, next) => {
         fotos: {
           select: {
             url_foto: true,
+          },
+        },
+        tecnico: {
+          include: {
+            usuario: {
+              select: {
+                urlFoto: true,
+              },
+            },
           },
         },
       },

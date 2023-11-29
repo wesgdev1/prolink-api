@@ -33,7 +33,15 @@ export const getAll = async (req, res, next) => {
           [orderBy]: direction,
         },
         include: {
-          soportesTecnicos: true,
+          soportesTecnicos: {
+            include: {
+              cliente: {
+                select: {
+                  nombreCompleto: true,
+                },
+              },
+            },
+          },
         },
       }),
       prisma.tecnico.count(),

@@ -41,8 +41,17 @@ export const getMySoportes = async (req, res, next) => {
   const { offset, limit } = parsePagination(query);
   const { orderBy, direction } = parseOrder({ fields, ...query });
   const { decoded = {} } = req;
-  const { idTipoUsuario: tecnicoId } = decoded;
-  console.log(tecnicoId);
+  const { idTipoUsuario, tipoUsuario } = decoded;
+  const where = {};
+
+  if (tipoUsuario === "Cliente") {
+    const clienteId = idTipoUsuario;
+    where.clienteId = clienteId;
+  } else {
+    const tecnicoId = idTipoUsuario;
+    where.tecnicoId = tecnicoId;
+  }
+
   try {
     const [result, total] = await Promise.all([
       prisma.soporteTecnico.findMany({
@@ -51,9 +60,7 @@ export const getMySoportes = async (req, res, next) => {
         orderBy: {
           [orderBy]: direction,
         },
-        where: {
-          tecnicoId,
-        },
+        where,
         include: {
           cliente: {
             select: {

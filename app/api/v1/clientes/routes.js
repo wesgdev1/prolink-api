@@ -6,7 +6,7 @@ export const router = Router();
 import * as controller from "./controller.js";
 import { auth } from "../auth.js";
 
-router.route("/").get(controller.getAll).post(auth, controller.create);
+router.route("/").get(auth, controller.getAll).post(auth, controller.create);
 
 router.param("id", controller.id);
 
