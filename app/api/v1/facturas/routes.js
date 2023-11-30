@@ -16,6 +16,7 @@ import { auth, owner } from "../auth.js";
 
 router.route("/").get(controller.getAll).post(auth, controller.create);
 router.route("/search/:ccClient").get(controller.search);
+router.route("/myFacturas").get(auth, controller.getMisFacturas);
 
 router.param("id", controller.id);
 

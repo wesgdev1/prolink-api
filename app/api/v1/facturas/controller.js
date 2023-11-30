@@ -30,6 +30,44 @@ export const create = async (req, res, next) => {
   }
 };
 
+export const getMisFacturas = async (req, res, next) => {
+  const { query = {} } = req;
+  const { offset, limit } = parsePagination(query);
+  const { orderBy, direction } = parseOrder({ fields, ...query });
+  const { decoded = {} } = req;
+  const { idTipoUsuario: clienteId } = decoded;
+
+  try {
+    const [result, total] = await Promise.all([
+      prisma.factura.findMany({
+        skip: offset,
+        take: limit,
+        orderBy: {
+          [orderBy]: direction,
+        },
+        where: {
+          clienteId,
+        },
+      }),
+      prisma.factura.count(),
+    ]);
+
+    res.json({
+      data: result,
+
+      meta: {
+        offset,
+        limit,
+        total,
+        orderBy,
+        direction,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getAll = async (req, res, next) => {
   const { query = {} } = req;
   const { offset, limit } = parsePagination(query);
