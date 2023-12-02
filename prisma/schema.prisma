@@ -11,10 +11,10 @@ datasource db {
 }
 
 model Usuario {
-  id              String       @id @default(uuid()) @db.Uuid
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime?    @updatedAt
-  email           String       @unique
+  id              String         @id @default(uuid()) @db.Uuid
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime?      @updatedAt
+  email           String         @unique
   tipoUsuario     String
   password        String
   urlFoto         String?
@@ -22,7 +22,10 @@ model Usuario {
   tecnico         Tecnico?
   comentarios     Comentario[]
   tipoDocumento   String?
-  numeroDocumento String?      @unique
+  numeroDocumento String?        @unique
+  mensajes        Mensaje[]
+  conversacionesA Conversacion[] @relation("usuarioA")
+  conversacionesB Conversacion[] @relation("usuarioB")
 }
 
 model Tecnico {
@@ -145,4 +148,25 @@ model Foto {
   createdAt DateTime @default(now())
   Blog      Blog?    @relation(fields: [blogId], references: [id])
   blogId    String?  @db.Uuid
+}
+
+model Mensaje {
+  id             String        @id @default(uuid()) @db.Uuid
+  createdAt      DateTime      @default(now())
+  content        String
+  Usuario        Usuario?      @relation(fields: [usuarioId], references: [id])
+  usuarioId      String?       @db.Uuid
+  conversacion   Conversacion? @relation(fields: [conversacionId], references: [id])
+  conversacionId String?       @db.Uuid
+}
+
+model Conversacion {
+  id             String    @id @default(uuid()) @db.Uuid
+  createdAt      DateTime  @default(now())
+  mensajes       Mensaje[]
+  usuarioA       Usuario?  @relation(fields: [usuarioCliente], references: [id], name: "usuarioA")
+  usuarioCliente String?   @db.Uuid
+  usuarioB       Usuario?  @relation(fields: [usuarioAdmin], references: [id], name: "usuarioB")
+  usuarioAdmin   String?   @db.Uuid
+  estado         Boolean   @default(false)
 }
