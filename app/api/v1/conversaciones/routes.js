@@ -8,4 +8,4 @@ export const router = Router();
 router.route("/").post(auth, controller.create);
 router.route("/").get(auth, controller.list);
 router.route("/:id").get(auth, controller.get);
-// router.route("/:id").put(auth, controller.get);
+router.route("/:id").put(auth, controller.update);

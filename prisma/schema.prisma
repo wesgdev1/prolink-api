@@ -161,12 +161,13 @@ model Mensaje {
 }
 
 model Conversacion {
-  id             String    @id @default(uuid()) @db.Uuid
-  createdAt      DateTime  @default(now())
-  mensajes       Mensaje[]
-  usuarioA       Usuario?  @relation(fields: [usuarioCliente], references: [id], name: "usuarioA")
-  usuarioCliente String?   @db.Uuid
-  usuarioB       Usuario?  @relation(fields: [usuarioAdmin], references: [id], name: "usuarioB")
-  usuarioAdmin   String?   @db.Uuid
-  estado         Boolean   @default(false)
+  id                 String    @id @default(uuid()) @db.Uuid
+  numeroConversacion Int?      @unique @default(autoincrement())
+  createdAt          DateTime  @default(now())
+  mensajes           Mensaje[]
+  usuarioA           Usuario?  @relation(fields: [usuarioCliente], references: [id], name: "usuarioA")
+  usuarioCliente     String?   @db.Uuid
+  usuarioB           Usuario?  @relation(fields: [usuarioAdmin], references: [id], name: "usuarioB")
+  usuarioAdmin       String?   @db.Uuid
+  estado             Boolean   @default(false)
 }

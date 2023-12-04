@@ -7,6 +7,26 @@ export const create = async (req, res, next) => {
   const { id: usuarioId } = decoded;
 
   try {
+    // primero valido si el usuario ya tiene una conversacion con el admin y su estado es false, si es asi, no creo una nueva conversacion
+    const conversacionExistente = await prisma.conversacion.findFirst({
+      where: {
+        AND: [
+          {
+            usuarioCliente: usuarioId,
+          },
+          {
+            usuarioAdmin: recipientId,
+          },
+        ],
+      },
+    });
+
+    if (conversacionExistente.estado === false) {
+      return next({
+        status: 400,
+        message: "Ya existe una conversacion con el admin pendiente",
+      });
+    }
     const conversacion = await prisma.conversacion.create({
       data: {
         usuarioCliente: usuarioId,
@@ -77,14 +97,40 @@ export const get = async (req, res, next) => {
         ],
       },
       include: {
-        usuarioA: true,
+        usuarioA: {
+          include: {
+            cliente: true,
+          },
+        },
         usuarioB: true,
 
         mensajes: {
           orderBy: {
-            createdAt: "desc",
+            createdAt: "asc",
           },
         },
+      },
+    });
+
+    res.json({
+      data: conversacion,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const update = async (req, res, next) => {
+  const { body = {}, params = {} } = req;
+  const { id: conversacionId } = params;
+
+  try {
+    const conversacion = await prisma.conversacion.update({
+      where: {
+        id: conversacionId,
+      },
+      data: {
+        ...body,
       },
     });
 
