@@ -243,7 +243,7 @@ export const hacerPing = async (req, res, next) => {
   // realiza la funcion para hacer ping a una ip
 
   try {
-    const isAlive = await ping.promise.probe("192.168.1.1");
+    const isAlive = await ping.promise.probe("8.8.8.8");
     if (isAlive.alive) {
       res.status(200).send({ data: { status: "bientos", time: isAlive.time } });
     } else {
