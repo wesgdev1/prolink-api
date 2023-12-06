@@ -69,6 +69,7 @@ export const getMySoportes = async (req, res, next) => {
             select: {
               nombreCompleto: true,
               email: true,
+              direccion: true,
             },
           },
         },
