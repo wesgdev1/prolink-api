@@ -45,7 +45,7 @@ export const signup = async (req, res, next) => {
           data: {
             ...body,
             password,
-            urlFoto: urlImages[0].url,
+            urlFoto: urlImages[0]?.url,
 
             tecnico: {
               connect: {
@@ -105,7 +105,7 @@ export const signup = async (req, res, next) => {
           data: {
             ...body,
             password,
-            urlFoto: urlImages[0].url,
+            urlFoto: urlImages[0]?.url,
 
             cliente: {
               connect: {

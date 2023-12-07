@@ -12,7 +12,7 @@ export const create = async (req, res, next) => {
       data: { ...body },
     });
 
-    const info = await transporter.sendMail(message);
+    // const info = await transporter.sendMail(message);
 
     res.status(201);
     res.json({
