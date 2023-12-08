@@ -116,10 +116,13 @@ export const id = async (req, res, next) => {
       where: {
         id: params.id,
       },
+      include: {
+        pagos: true,
+      },
     });
 
     if (result === null) {
-      next({ message: "Blog not found", status: 404 });
+      next({ message: "Factura not found", status: 404 });
     } else {
       req.data = result;
 
@@ -170,16 +173,21 @@ export const remove = async (req, res, error) => {
 };
 
 export const search = async (req, res, next) => {
-  console.log("search");
   const { params = {} } = req;
   const { ccClient } = params;
-  console.log(ccClient);
 
   try {
     const result = await prisma.factura.findMany({
       where: {
         cliente: {
           numeroDocumento: ccClient,
+        },
+      },
+      include: {
+        cliente: {
+          select: {
+            nombreCompleto: true,
+          },
         },
       },
     });

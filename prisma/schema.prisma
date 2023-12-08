@@ -61,7 +61,6 @@ model Cliente {
   usuario          Usuario?         @relation(fields: [usuarioId], references: [id])
   usuarioId        String?          @unique @db.Uuid
   facturas         Factura[]
-  pagos            Pago[]
   soportesTecnicos SoporteTecnico[]
 }
 
@@ -131,15 +130,11 @@ model Factura {
 }
 
 model Pago {
-  id        String    @id @default(uuid()) @db.Uuid
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-  fechaPago DateTime
-  valor     Float
-  factura   Factura   @relation(fields: [facturaId], references: [id])
-  facturaId String    @db.Uuid
-  cliente   Cliente?  @relation(fields: [clienteId], references: [id])
-  clienteId String?   @db.Uuid
+  id             String   @id @default(uuid()) @db.Uuid
+  createdAt      DateTime @default(now())
+  factura        Factura  @relation(fields: [facturaId], references: [id])
+  facturaId      String   @db.Uuid
+  referenciaPago String?
 }
 
 model Foto {

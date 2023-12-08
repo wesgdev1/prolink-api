@@ -26,12 +26,12 @@ export const createOrder = async (req, res, next) => {
     ],
 
     back_urls: {
-      success: `http://localhost:5173/success?ref=${body.referencia}`,
+      success: `http://localhost:5173/success?ref=${body.idReferencia}`,
       failure: "http://localhost:5173/error",
-      pending: "http://localhost:5173/pending",
+      pending: "http://localhost:5173/error",
     },
     notification_url:
-      "https://ad28-186-31-38-126.ngrok.io/api/v1/pagos/webhook",
+      "https://bff2-2800-484-8d87-1000-6482-131c-3b35-5437.ngrok.io/api/v1/pagos/webhook",
   });
 
   res.send(result.body.init_point);
@@ -57,14 +57,35 @@ export const webhook = async (req, res, next) => {
         console.log("metodo de pago", data.body.payment_method.type);
       console.log("ACTUALIZO el campo estado de la tabla factura");
       // actualizo el campo estado de la tabla factura
-      const result = await prisma.factura.update({
-        where: {
-          id: data.body.external_reference,
-        },
-        data: {
-          estado: true,
-        },
-      });
+
+      if (data.body.status === "approved" && data.status === 200) {
+        const result = await prisma.factura.update({
+          where: {
+            id: data.body.external_reference,
+          },
+          data: {
+            estado: true,
+          },
+        });
+
+        if (result) {
+          const result2 = await prisma.pago.create({
+            data: {
+              referenciaPago: data.body.id.toString(),
+              facturaId: data.body.external_reference,
+            },
+          });
+        }
+      } else {
+        const result = await prisma.factura.update({
+          where: {
+            id: data.body.external_reference,
+          },
+          data: {
+            estado: false,
+          },
+        });
+      }
     }
 
     res.status(200).send("Ok");
