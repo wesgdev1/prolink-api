@@ -21,7 +21,7 @@ export const create = async (req, res, next) => {
       },
     });
 
-    if (conversacionExistente.estado === false) {
+    if (conversacionExistente && conversacionExistente?.estado === false) {
       return next({
         status: 400,
         message: "Ya existe una conversacion con el admin pendiente",
@@ -61,6 +61,9 @@ export const list = async (req, res, next) => {
       include: {
         usuarioA: true,
         usuarioB: true,
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
 
