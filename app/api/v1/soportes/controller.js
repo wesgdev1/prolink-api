@@ -1,6 +1,6 @@
 import { prisma } from "../../../database.js";
 import { parsePagination, parseOrder } from "../../../uutils.js";
-import { message, transporter } from "../mailer.js";
+import { mensajeSoporte, transporter } from "../mailer.js";
 import { fields } from "./model.js";
 import fs from "fs";
 
@@ -10,9 +10,17 @@ export const create = async (req, res, next) => {
   try {
     const result = await prisma.soporteTecnico.create({
       data: { ...body },
+      include: {
+        cliente: true,
+        tecnico: true,
+      },
     });
+    const { cliente } = result;
+    const { email } = cliente;
 
     // const info = await transporter.sendMail(message);
+    const mensaje = mensajeSoporte({ emailCliente: email, mensaje: result });
+    await transporter.sendMail(mensaje);
 
     res.status(201);
     res.json({
