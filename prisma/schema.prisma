@@ -166,3 +166,10 @@ model Conversacion {
   usuarioAdmin       String?   @db.Uuid
   estado             Boolean   @default(false)
 }
+
+model Ping {
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+  ip        String
+  estado    Boolean  @default(false)
+}

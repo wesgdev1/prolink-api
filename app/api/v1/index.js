@@ -8,6 +8,7 @@ import { router as clientes } from "./clientes/routes.js";
 import { router as soportes } from "./soportes/routes.js";
 import { router as mensajes } from "./mensajes/routes.js";
 import { router as conversaciones } from "./conversaciones/routes.js";
+import { router as pings } from "./pings/routes.js";
 
 // eslint-disable-next-line new-cap
 export const router = Router();
@@ -21,3 +22,4 @@ router.use("/clientes", clientes);
 router.use("/soportes", soportes);
 router.use("/mensajes", mensajes);
 router.use("/conversaciones", conversaciones);
+router.use("/pings", pings);
