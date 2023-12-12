@@ -262,7 +262,7 @@ export const id = async (req, res, next) => {
     });
 
     if (result === null) {
-      next({ message: "Blog not found", status: 404 });
+      next({ message: "User not found", status: 404 });
     } else {
       req.result = result;
 
@@ -280,13 +280,19 @@ export const read = async (req, res, next) => {
 export const update = async (req, res, next) => {
   const { params = {}, body = {} } = req;
   const { id } = params;
+  const files = req.files;
 
   try {
+    const promises = files.map((file) => {
+      return uploadFiles(file.path);
+    });
+    const urlImages = await Promise.all(promises);
+
     const result = await prisma.usuario.update({
       where: {
         id,
       },
-      data: { ...body, updatedAt: new Date().toISOString() },
+      data: { urlFoto: urlImages[0]?.url, updatedAt: new Date().toISOString() },
     });
 
     res.json({ data: result });
@@ -307,6 +313,43 @@ export const remove = async (req, res, error) => {
     });
     res.status(204);
     res.end();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const changePassword = async (req, res, next) => {
+  const { body = {}, decoded = {} } = req;
+  const { id } = decoded;
+
+  try {
+    const user = await prisma.usuario.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        password: true,
+      },
+    });
+
+    const passwordMatch = await verifyPassword(body.password, user.password);
+
+    if (!passwordMatch) {
+      return next({ message: "Contraseña incorrecta", status: 400 });
+    }
+
+    const newPassword = await encryptPassword(body.newPassword);
+
+    const result = await prisma.usuario.update({
+      where: {
+        id,
+      },
+      data: {
+        password: newPassword,
+      },
+    });
+
+    res.json({ data: result });
   } catch (error) {
     next(error);
   }
