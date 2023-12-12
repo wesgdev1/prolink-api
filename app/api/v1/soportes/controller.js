@@ -1,5 +1,6 @@
 import { prisma } from "../../../database.js";
 import { parsePagination, parseOrder } from "../../../uutils.js";
+import { mensajeSoporte, transporter } from "../mailer.js";
 import { fields } from "./model.js";
 import fs from "fs";
 
@@ -9,7 +10,17 @@ export const create = async (req, res, next) => {
   try {
     const result = await prisma.soporteTecnico.create({
       data: { ...body },
+      include: {
+        cliente: true,
+        tecnico: true,
+      },
     });
+    const { cliente } = result;
+    const { email } = cliente;
+
+    // const info = await transporter.sendMail(message);
+    const mensaje = mensajeSoporte({ emailCliente: email, mensaje: result });
+    await transporter.sendMail(mensaje);
 
     res.status(201);
     res.json({
@@ -24,7 +35,7 @@ export const getSoportesoftheDay = async (req, res, next) => {
   try {
     const result = await prisma.soporteTecnico.findMany({
       where: {
-        fecha: new Date().toISOString().split("T")[0],
+        fechaGeneracion: new Date().toISOString().split("T")[0],
       },
     });
 
@@ -41,8 +52,17 @@ export const getMySoportes = async (req, res, next) => {
   const { offset, limit } = parsePagination(query);
   const { orderBy, direction } = parseOrder({ fields, ...query });
   const { decoded = {} } = req;
-  const { idTipoUsuario: tecnicoId } = decoded;
-  console.log(tecnicoId);
+  const { idTipoUsuario, tipoUsuario } = decoded;
+  const where = {};
+
+  if (tipoUsuario === "Cliente") {
+    const clienteId = idTipoUsuario;
+    where.clienteId = clienteId;
+  } else {
+    const tecnicoId = idTipoUsuario;
+    where.tecnicoId = tecnicoId;
+  }
+
   try {
     const [result, total] = await Promise.all([
       prisma.soporteTecnico.findMany({
@@ -51,14 +71,13 @@ export const getMySoportes = async (req, res, next) => {
         orderBy: {
           [orderBy]: direction,
         },
-        where: {
-          tecnicoId,
-        },
+        where,
         include: {
           cliente: {
             select: {
               nombreCompleto: true,
               email: true,
+              direccion: true,
             },
           },
         },

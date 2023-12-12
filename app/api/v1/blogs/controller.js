@@ -3,6 +3,7 @@ import { parsePagination, parseOrder } from "../../../uutils.js";
 import { uploadFiles } from "../../uploadsFile/uploads.js";
 import { fields } from "./model.js";
 import fs from "fs";
+import ping from "ping";
 
 export const create = async (req, res, next) => {
   const { body = {}, decoded = {} } = req;
@@ -103,8 +104,12 @@ export const getAll = async (req, res, next) => {
         },
         include: {
           tecnico: {
-            select: {
-              email: true,
+            include: {
+              usuario: {
+                select: {
+                  urlFoto: true,
+                },
+              },
             },
           },
           fotos: {
@@ -145,6 +150,15 @@ export const id = async (req, res, next) => {
         fotos: {
           select: {
             url_foto: true,
+          },
+        },
+        tecnico: {
+          include: {
+            usuario: {
+              select: {
+                urlFoto: true,
+              },
+            },
           },
         },
       },
@@ -216,6 +230,25 @@ export const remove = async (req, res, error) => {
     });
     res.status(204);
     res.end();
+  } catch (error) {
+    next(error);
+  }
+};
+
+// hacer ping a una ip que envian en la Id
+// si response envia estatus 200 si no 404
+// realiza el controlador para hacer ping a una ip
+
+export const hacerPing = async (req, res, next) => {
+  // realiza la funcion para hacer ping a una ip
+
+  try {
+    const isAlive = await ping.promise.probe("8.8.8.8");
+    if (isAlive.alive) {
+      res.status(200).send({ data: { status: "bientos", time: isAlive.time } });
+    } else {
+      res.status(200).send({ data: { status: "bientos", time: isAlive.time } });
+    }
   } catch (error) {
     next(error);
   }

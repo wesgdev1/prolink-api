@@ -35,11 +35,16 @@ export const auth = async (req, res, next) => {
 
 export const owner = async (req, res, next) => {
   const { decoded = {}, data = {} } = req;
-  const { idTipoUsuario: owerId } = decoded;
+  const { idTipoUsuario: owerId, tipoUsuario } = decoded;
   const { tecnicoId } = data;
+
+  if (tipoUsuario === "Admin") {
+    return next();
+  }
 
   if (owerId !== tecnicoId) {
     return next({ message: "Forbidden", status: 401 });
   }
+
   next();
 };

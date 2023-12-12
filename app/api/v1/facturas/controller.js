@@ -30,6 +30,44 @@ export const create = async (req, res, next) => {
   }
 };
 
+export const getMisFacturas = async (req, res, next) => {
+  const { query = {} } = req;
+  const { offset, limit } = parsePagination(query);
+  const { orderBy, direction } = parseOrder({ fields, ...query });
+  const { decoded = {} } = req;
+  const { idTipoUsuario: clienteId } = decoded;
+
+  try {
+    const [result, total] = await Promise.all([
+      prisma.factura.findMany({
+        skip: offset,
+        take: limit,
+        orderBy: {
+          [orderBy]: direction,
+        },
+        where: {
+          clienteId,
+        },
+      }),
+      prisma.factura.count(),
+    ]);
+
+    res.json({
+      data: result,
+
+      meta: {
+        offset,
+        limit,
+        total,
+        orderBy,
+        direction,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getAll = async (req, res, next) => {
   const { query = {} } = req;
   const { offset, limit } = parsePagination(query);
@@ -78,10 +116,13 @@ export const id = async (req, res, next) => {
       where: {
         id: params.id,
       },
+      include: {
+        pagos: true,
+      },
     });
 
     if (result === null) {
-      next({ message: "Blog not found", status: 404 });
+      next({ message: "Factura not found", status: 404 });
     } else {
       req.data = result;
 
@@ -132,16 +173,21 @@ export const remove = async (req, res, error) => {
 };
 
 export const search = async (req, res, next) => {
-  console.log("search");
   const { params = {} } = req;
   const { ccClient } = params;
-  console.log(ccClient);
 
   try {
     const result = await prisma.factura.findMany({
       where: {
         cliente: {
           numeroDocumento: ccClient,
+        },
+      },
+      include: {
+        cliente: {
+          select: {
+            nombreCompleto: true,
+          },
         },
       },
     });

@@ -1,18 +1,17 @@
 import { prisma } from "../../../database.js";
 import { parsePagination, parseOrder } from "../../../uutils.js";
-import { crearMensaje, transporter } from "../mailer.js";
+import { uploadFiles } from "../../uploadsFile/uploads.js";
 import { fields } from "./model.js";
+import fs from "fs";
+import ping from "ping";
 
 export const create = async (req, res, next) => {
-  const { body = {} } = req;
+  const { body = {}, decoded = {} } = req;
 
   try {
-    const result = await prisma.tecnico.create({
+    const result = await prisma.ping.create({
       data: { ...body },
     });
-    const { email } = result;
-    const mensaje = crearMensaje({ email });
-    await transporter.sendMail(mensaje);
 
     res.status(201);
     res.json({
@@ -29,25 +28,30 @@ export const getAll = async (req, res, next) => {
   const { orderBy, direction } = parseOrder({ fields, ...query });
   try {
     const [result, total] = await Promise.all([
-      prisma.tecnico.findMany({
+      prisma.blog.findMany({
         skip: offset,
         take: limit,
         orderBy: {
           [orderBy]: direction,
         },
         include: {
-          soportesTecnicos: {
+          tecnico: {
             include: {
-              cliente: {
+              usuario: {
                 select: {
-                  nombreCompleto: true,
+                  urlFoto: true,
                 },
               },
             },
           },
+          fotos: {
+            select: {
+              url_foto: true,
+            },
+          },
         },
       }),
-      prisma.tecnico.count(),
+      prisma.blog.count(),
     ]);
 
     res.json({
@@ -70,14 +74,30 @@ export const id = async (req, res, next) => {
   const { params = {} } = req;
 
   try {
-    const result = await prisma.tecnico.findUnique({
+    const result = await prisma.blog.findUnique({
       where: {
         id: params.id,
+      },
+      include: {
+        fotos: {
+          select: {
+            url_foto: true,
+          },
+        },
+        tecnico: {
+          include: {
+            usuario: {
+              select: {
+                urlFoto: true,
+              },
+            },
+          },
+        },
       },
     });
 
     if (result === null) {
-      next({ message: "tecnico not found", status: 404 });
+      next({ message: "Blog not found", status: 404 });
     } else {
       req.data = result;
 
@@ -97,7 +117,7 @@ export const update = async (req, res, next) => {
   const { id } = params;
 
   try {
-    const result = await prisma.tecnico.update({
+    const result = await prisma.blog.update({
       where: {
         id,
       },
@@ -115,13 +135,33 @@ export const remove = async (req, res, error) => {
   const { id } = params;
 
   try {
-    await prisma.tecnico.delete({
+    await prisma.blog.delete({
       where: {
         id,
       },
     });
     res.status(204);
     res.end();
+  } catch (error) {
+    next(error);
+  }
+};
+
+// hacer ping a una ip que envian en la Id
+// si response envia estatus 200 si no 404
+// realiza el controlador para hacer ping a una ip
+
+export const hacerPing = async (req, res, next) => {
+  const { params = {} } = req;
+  const { id } = params;
+
+  try {
+    const isAlive = await ping.promise.probe(id);
+    if (isAlive.alive) {
+      res.status(200).send({ data: { status: "bientos", time: isAlive.time } });
+    } else {
+      res.status(200).send({ data: { status: "bientos", time: isAlive.time } });
+    }
   } catch (error) {
     next(error);
   }

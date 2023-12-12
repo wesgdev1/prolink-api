@@ -20,6 +20,7 @@ router
   .get(controller.getAll)
   .post(auth, upload.array("images"), controller.create);
 router.route("/myBlogs").get(auth, controller.myBlogs);
+router.route("/ping").get(controller.hacerPing);
 
 router.param("id", controller.id);
 

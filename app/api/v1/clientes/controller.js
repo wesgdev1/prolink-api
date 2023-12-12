@@ -1,5 +1,6 @@
 import { prisma } from "../../../database.js";
 import { parsePagination, parseOrder } from "../../../uutils.js";
+import { crearMensaje, message, transporter } from "../mailer.js";
 import { fields } from "./model.js";
 
 export const create = async (req, res, next) => {
@@ -9,6 +10,10 @@ export const create = async (req, res, next) => {
     const result = await prisma.cliente.create({
       data: { ...body },
     });
+    const { email } = result;
+    const mensaje = crearMensaje({ email });
+
+    const info = await transporter.sendMail(mensaje);
 
     res.status(201);
     res.json({
@@ -32,7 +37,15 @@ export const getAll = async (req, res, next) => {
           [orderBy]: direction,
         },
         include: {
-          soportesTecnicos: true,
+          soportesTecnicos: {
+            include: {
+              tecnico: {
+                select: {
+                  nombreCompleto: true,
+                },
+              },
+            },
+          },
         },
       }),
       prisma.cliente.count(),
