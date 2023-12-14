@@ -1,6 +1,6 @@
 import { prisma } from "../../../database.js";
 import { parsePagination, parseOrder } from "../../../uutils.js";
-import { crearMensaje, message, transporter } from "../mailer.js";
+import { crearMensaje, transporter } from "../mailer.js";
 import { fields } from "./model.js";
 
 export const create = async (req, res, next) => {

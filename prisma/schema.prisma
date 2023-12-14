@@ -116,6 +116,7 @@ model SoporteTecnico {
 
 model Factura {
   id                  String    @id @default(uuid()) @db.Uuid
+  numeroFactura       String?
   createdAt           DateTime  @default(now())
   updatedAt           DateTime? @updatedAt
   fechaLimite         DateTime
