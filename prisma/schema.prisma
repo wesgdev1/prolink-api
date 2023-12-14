@@ -88,14 +88,13 @@ model Categoria {
 }
 
 model Comentario {
-  id        String    @id @default(uuid()) @db.Uuid
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
   content   String
-  blog      Blog      @relation(fields: [blogId], references: [id])
-  blogId    String    @db.Uuid
-  usuario   Usuario   @relation(fields: [usuarioId], references: [id])
-  usuarioId String    @db.Uuid
+  blog      Blog     @relation(fields: [blogId], references: [id])
+  blogId    String   @db.Uuid
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id])
+  usuarioId String   @db.Uuid
 }
 
 model SoporteTecnico {
@@ -171,5 +170,15 @@ model Ping {
   id        String   @id @default(uuid()) @db.Uuid
   createdAt DateTime @default(now())
   ip        String
+  estado    Boolean  @default(false)
+}
+
+model Consultas {
+  id        String   @id @default(uuid()) @db.Uuid
+  createdAt DateTime @default(now())
+  email     String
+  nombre    String
+  telefono  String
+  mensaje   String
   estado    Boolean  @default(false)
 }

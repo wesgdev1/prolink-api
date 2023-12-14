@@ -158,9 +158,9 @@ export const hacerPing = async (req, res, next) => {
   try {
     const isAlive = await ping.promise.probe(id);
     if (isAlive.alive) {
-      res.status(200).send({ data: { status: "bientos", time: isAlive.time } });
+      res.status(200).send({ data: { status: "Ok", time: isAlive.time } });
     } else {
-      res.status(200).send({ data: { status: "bientos", time: isAlive.time } });
+      res.status(200).send({ data: { status: "Ok", time: isAlive.time } });
     }
   } catch (error) {
     next(error);
