@@ -26,12 +26,11 @@ export const createOrder = async (req, res, next) => {
     ],
 
     back_urls: {
-      success: `http://localhost:5173/success?ref=${body.idReferencia}`,
-      failure: "http://localhost:5173/error",
-      pending: "http://localhost:5173/error",
+      success: `${process.env.WEB_URL}/success?ref=${body.idReferencia}`,
+      failure: `${process.env.WEB_URL}/error`,
+      pending: `${process.env.WEB_URL}/error`,
     },
-    notification_url:
-      "https://bff2-2800-484-8d87-1000-6482-131c-3b35-5437.ngrok.io/api/v1/pagos/webhook",
+    notification_url: `${process.env.API_HTTPS_URL}/api/v1/pagos/webhook`,
   });
 
   res.send(result.body.init_point);

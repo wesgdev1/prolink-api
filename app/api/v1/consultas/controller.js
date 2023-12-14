@@ -1,19 +1,15 @@
 import { prisma } from "../../../database.js";
 import { parsePagination, parseOrder } from "../../../uutils.js";
-import { crearMensaje, transporter } from "../mailer.js";
+import { mensajeSoporte, transporter } from "../mailer.js";
 import { fields } from "./model.js";
 
 export const create = async (req, res, next) => {
-  const { body = {}, decoded = {} } = req;
+  const { body = {} } = req;
 
   try {
-    const result = await prisma.cliente.create({
-      data: { ...body },
+    const result = await prisma.consultas.create({
+      data: { ...body, telefono: body.telefono.toString() },
     });
-    const { email } = result;
-    const mensaje = crearMensaje({ email });
-
-    const info = await transporter.sendMail(mensaje);
 
     res.status(201);
     res.json({
@@ -23,32 +19,23 @@ export const create = async (req, res, next) => {
     next(error);
   }
 };
-
 export const getAll = async (req, res, next) => {
   const { query = {} } = req;
   const { offset, limit } = parsePagination(query);
   const { orderBy, direction } = parseOrder({ fields, ...query });
   try {
     const [result, total] = await Promise.all([
-      prisma.cliente.findMany({
+      prisma.consultas.findMany({
         skip: offset,
         take: limit,
         orderBy: {
           [orderBy]: direction,
         },
-        include: {
-          soportesTecnicos: {
-            include: {
-              tecnico: {
-                select: {
-                  nombreCompleto: true,
-                },
-              },
-            },
-          },
+        where: {
+          estado: false,
         },
       }),
-      prisma.cliente.count(),
+      prisma.consultas.count(),
     ]);
 
     res.json({
@@ -71,14 +58,14 @@ export const id = async (req, res, next) => {
   const { params = {} } = req;
 
   try {
-    const result = await prisma.cliente.findUnique({
+    const result = await prisma.consultas.findUnique({
       where: {
         id: params.id,
       },
     });
 
     if (result === null) {
-      next({ message: "Client not found", status: 404 });
+      next({ message: "consulta not found", status: 404 });
     } else {
       req.data = result;
 
@@ -98,31 +85,14 @@ export const update = async (req, res, next) => {
   const { id } = params;
 
   try {
-    const result = await prisma.cliente.update({
+    const result = await prisma.consultas.update({
       where: {
         id,
       },
-      data: { ...body, updatedAt: new Date().toISOString() },
+      data: { ...body },
     });
 
     res.json({ data: result });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const remove = async (req, res, error) => {
-  const { params = {} } = req;
-  const { id } = params;
-
-  try {
-    await prisma.cliente.delete({
-      where: {
-        id,
-      },
-    });
-    res.status(204);
-    res.end();
   } catch (error) {
     next(error);
   }
