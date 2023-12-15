@@ -118,6 +118,7 @@ export const getAll = async (req, res, next) => {
             select: {
               nombreCompleto: true,
               email: true,
+              telefono: true,
             },
           },
         },
