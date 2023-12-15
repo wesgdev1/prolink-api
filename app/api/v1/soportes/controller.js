@@ -78,6 +78,7 @@ export const getMySoportes = async (req, res, next) => {
               nombreCompleto: true,
               email: true,
               direccion: true,
+              telefono: true,
             },
           },
         },
