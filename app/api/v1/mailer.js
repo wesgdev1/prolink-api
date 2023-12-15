@@ -105,7 +105,7 @@ export const mensajeSoporte = ({ emailCliente, mensaje }) => {
                     <p style="margin-bottom: 50px;"><i>Atentamente:</i><br>Equipo Prolink</p>
     
                     <!-- Botón -->
-                    <a class="claseBoton" href="https://www.pretwor.com/">Prolink</a>
+                    <a class="claseBoton" href="https://prolink-ncf0.onrender.com/signup">Prolink</a>
                 </div>
                 <!-- Contenido principal -->
     
@@ -209,7 +209,7 @@ export const crearMensaje = ({ email }) => {
                     <p style="margin-bottom: 50px;"><i>Atentamente:</i><br>Equipo Prolink</p>
     
                     <!-- Botón -->
-                    <a class="claseBoton" href="https://www.pretwor.com/">Prolink</a>
+                    <a class="claseBoton" href="https://prolink-ncf0.onrender.com/signup">Prolink</a>
                 </div>
                 <!-- Contenido principal -->
     
@@ -312,7 +312,7 @@ export const message = {
                   <p style="margin-bottom: 50px;"><i>Atentamente:</i><br>Equipo Prolink</p>
   
                   <!-- Botón -->
-                  <a class="claseBoton" href="https://www.pretwor.com/">Prolink</a>
+                  <a class="claseBoton" href="https://prolink-ncf0.onrender.com/signup">Prolink</a>
               </div>
               <!-- Contenido principal -->
   
