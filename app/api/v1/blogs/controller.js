@@ -2,6 +2,7 @@ import { prisma } from "../../../database.js";
 import { parsePagination, parseOrder } from "../../../uutils.js";
 import { uploadFiles } from "../../uploadsFile/uploads.js";
 import { fields } from "./model.js";
+import fs from "fs";
 
 export const create = async (req, res, next) => {
   const { body = {}, decoded = {} } = req;
