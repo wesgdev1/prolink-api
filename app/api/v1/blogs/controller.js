@@ -7,7 +7,6 @@ import fs from "fs";
 export const create = async (req, res, next) => {
   const { body = {}, decoded = {} } = req;
   const { idTipoUsuario: tecnicoId } = decoded;
-  const files = req.files;
 
   try {
     const promises = files.map((file) => {
