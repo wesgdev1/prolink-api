@@ -50,15 +50,16 @@ model Cliente {
   updatedAt        DateTime?        @updatedAt
   nombreCompleto   String
   email            String?          @unique
-  numeroContrato   String?
+  numeroContrato   String?          @unique
   contratoActivo   Boolean          @default(true)
   tipoDocumento    String
-  numeroDocumento  String           @unique
+  numeroDocumento  String
   telefono         String
   direccion        String
   servicio         String?
   ipNavegacion     String?
   ipAntena         String?
+  ubicacion        String?
   usuario          Usuario?         @relation(fields: [usuarioId], references: [id])
   usuarioId        String?          @unique @db.Uuid
   facturas         Factura[]
