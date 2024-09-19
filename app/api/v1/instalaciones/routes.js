@@ -10,8 +10,13 @@ import { handleErrorsValidations } from "../middlewares.js";
 
 router
   .route("/")
-  .get(controller.getAll)
-  .post(validateInstalationCreate, handleErrorsValidations, controller.create);
+  .get(auth, controller.getAll)
+  .post(
+    auth,
+    validateInstalationCreate,
+    handleErrorsValidations,
+    controller.create
+  );
 
 router.param("id", controller.id);
 

@@ -13,7 +13,12 @@ export const serviceCreate = async (data) => {
 
 export const serviceGetAll = async () => {
   try {
-    const result = await prisma.instalation.findMany();
+    const result = await prisma.instalation.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
     return result;
   } catch (error) {
     throw error;

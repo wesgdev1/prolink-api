@@ -13,7 +13,8 @@ export const create = async (req, res, next) => {
     const { email } = result;
     const mensaje = crearMensaje({ email });
 
-    const info = await transporter.sendMail(mensaje);
+    // const info = await transporter.sendMail(mensaje);
+    // desconmentar para enviar correo
 
     res.status(201);
     res.json({
