@@ -203,14 +203,14 @@ model Instalation {
   dateTime    String?
 }
 
-model CustomerRetired {
-  id         String   @id @default(uuid()) @db.Uuid
-  createdAt  DateTime @default(now())
-  nameClient String
-  email      String?
-  phone      String
-  address    String
-  ubication  String?
-  stateDay   Boolean  @default(false)
-  viability  Boolean  @default(true)
+model Excustomer {
+  id          String   @id @default(uuid()) @db.Uuid
+  createdAt   DateTime @default(now())
+  nameClient  String
+  phone       String
+  address     String
+  ubication   String?
+  observation String?
+  dateTime    String?
+  status      Boolean  @default(false)
 }

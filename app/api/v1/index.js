@@ -12,6 +12,7 @@ import { router as pings } from "./pings/routes.js";
 import { router as consultas } from "./consultas/routes.js";
 import { router as comentarios } from "./comentarios/routes.js";
 import { router as instalaciones } from "./instalaciones/routes.js";
+import { router as retiros } from "./excustomers/routes.js";
 
 // eslint-disable-next-line new-cap
 export const router = Router();
@@ -29,3 +30,4 @@ router.use("/pings", pings);
 router.use("/consultas", consultas);
 router.use("/comentarios", comentarios);
 router.use("/instalaciones", instalaciones);
+router.use("/retiros", retiros);
