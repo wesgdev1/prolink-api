@@ -63,6 +63,7 @@ model Cliente {
   ipPublica        String?
   fechaContrato    String?
   cicloFacturacion String?
+  valorFactura     Int?
   usuario          Usuario?         @relation(fields: [usuarioId], references: [id])
   usuarioId        String?          @unique @db.Uuid
   facturas         Factura[]
