@@ -52,6 +52,7 @@ model Cliente {
   email            String?          @unique
   numeroContrato   String?          @unique
   contratoActivo   Boolean          @default(true)
+  enMora           Boolean          @default(false)
   tipoDocumento    String
   numeroDocumento  String
   telefono         String
