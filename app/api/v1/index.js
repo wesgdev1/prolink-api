@@ -14,6 +14,7 @@ import { router as comentarios } from "./comentarios/routes.js";
 import { router as instalaciones } from "./instalaciones/routes.js";
 import { router as retiros } from "./excustomers/routes.js";
 import { router as barrios } from "./barrios/routes.js";
+import { router as services } from "./services/routes.js";
 
 // eslint-disable-next-line new-cap
 export const router = Router();
@@ -33,3 +34,4 @@ router.use("/comentarios", comentarios);
 router.use("/instalaciones", instalaciones);
 router.use("/retiros", retiros);
 router.use("/barrios", barrios);
+router.use("/services", services);

@@ -57,18 +57,19 @@ model Cliente {
   numeroDocumento  String
   telefono         String
   direccion        String
-  servicio         String?
-  ipNavegacion     String?
-  ipAntena         String?
-  ubicacion        String?
-  ipPublica        String?
-  fechaContrato    String?
-  cicloFacturacion String?
-  valorFactura     Int?
+  // servicio         String?
+  // ipNavegacion     String?
+  // ipAntena         String?
+  // ubicacion        String?
+  // ipPublica        String?
+  // fechaContrato    String?
+  // cicloFacturacion String?
+  // valorFactura     Int?
   usuario          Usuario?         @relation(fields: [usuarioId], references: [id])
   usuarioId        String?          @unique @db.Uuid
   facturas         Factura[]
   soportesTecnicos SoporteTecnico[]
+  servicios        ServiceClient[]
 
   Barrio   Barrio? @relation(fields: [barrioId], references: [id])
   barrioId String? @db.Uuid
@@ -226,4 +227,40 @@ model Excustomer {
   observation String?
   dateTime    String?
   status      Boolean  @default(false)
+}
+
+model Service {
+  id                String          @id @default(uuid()) @db.Uuid
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime?       @updatedAt
+  typeService       String
+  bandwidthDownload Int?
+  bandwidthUpload   Int?
+  name              String
+  description       String?
+  price             Int?
+  status            Boolean         @default(true)
+  servicesClient    ServiceClient[]
+}
+
+model ServiceClient {
+  id               String   @id @default(uuid()) @db.Uuid
+  createdAt        DateTime @default(now())
+  state            Boolean  @default(true)
+  cicloFacturacion String?
+  fechaContrato    String?
+  ipNavegacion     String?
+  ipAntena         String?
+  ipPublica        String?
+  valorContrato    Int?
+  valorFactura     Int?
+  address          String
+  ubication        String?
+  observation      String?
+  dateTime         String?
+  status           Boolean  @default(false)
+  service          Service? @relation(fields: [serviceId], references: [id])
+  serviceId        String?  @db.Uuid
+  Cliente          Cliente? @relation(fields: [clienteId], references: [id])
+  clienteId        String?  @db.Uuid
 }
